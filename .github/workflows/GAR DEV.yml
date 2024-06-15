@@ -15,7 +15,7 @@ env:
   PROJECT_ID: proyecto-sfactory-devqas # Google Cloud project id
   REPO_NAME: dev # repository name
   APP_NAME: dev-kvs # service name
-  APP_NAME2: dev-cbs # service name
+  APP_NAME2: dev-bsc # service name
   
 jobs:
   build:
@@ -33,7 +33,7 @@ jobs:
 
       - name: Build and Push Container
         run: |-
-          docker build -t "${{ env.GAR_LOCATION }}/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.APP_NAME }}:${{ github.sha }}" -f Dockerfile.storage ./
+          docker build -t "${{ env.GAR_LOCATION }}/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.APP_NAME2 }}:${{ github.sha }}" -f Dockerfile.storage ./
           docker push "${{ env.GAR_LOCATION }}/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.APP_NAME2 }}:${{ github.sha }}"
         # DOCKER_BUILDKIT=1 docker build --target ${{ env.REPO_NAME }} -t "${{ env.GAR_LOCATION }}/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.APP_NAME }}:${{ github.sha }}" ./
         # docker push "${{ env.GAR_LOCATION }}/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.APP_NAME }}:${{ github.sha }}"
