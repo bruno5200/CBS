@@ -1,0 +1,34 @@
+name: testing pipeline
+
+on:
+  push:
+    branches:
+      - dev
+    paths-ignore:
+      - "docs/**"
+      - "README.md"
+      - "Makefile"
+      - sql/**
+
+  pull_request:
+    branches:
+      - dev
+    paths-ignore:
+      - "docs/**"
+      - "README.md"
+      - "Makefile"
+      - sql/**
+
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.22.x"
+
+      - name: Run
+        run: make dbuildt drund test

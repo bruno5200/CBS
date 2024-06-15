@@ -1,0 +1,36 @@
+version: '3.9'
+services:
+  svc:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - app.env
+    restart: unless-stopped
+    container_name: svc
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - memcached
+  
+  memcached:
+    image: memcached:1.6.27-alpine
+    container_name: memcached
+    ports:
+      - "11211:11211"
+    restart: always
+  
+  db:
+    image: postgres:alpine
+    container_name: db
+    ports:
+      - "5432:5432"
+    env_file:
+      - db.env
+    restart: always
+    volumes:
+      - secrets-db:/var/lib/postgresql/data
+
+volumes:
+  secrets-db:

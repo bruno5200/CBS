@@ -1,0 +1,22 @@
+FROM golang:1.22.3 AS build-back
+
+RUN mkdir /app
+COPY . /app
+WORKDIR /app
+RUN CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -extldflags '-static'" -installsuffix cgo -tags netgo -o api-blob -v blob/app.go
+RUN strip api-blob
+
+FROM scratch
+LABEL name="blob" \
+	version="0.1.15"
+WORKDIR /
+
+COPY --from=build-back /app/api-blob ./
+
+# COPY certs/validation.cert certs/validation.key ./certs/
+
+ENV PORT 9500
+
+CMD ["/api-blob"]
+
+EXPOSE 9500
