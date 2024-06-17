@@ -1,0 +1,16 @@
+FROM golang:1.22.3 AS build
+
+RUN mkdir /app
+COPY . /app
+WORKDIR /app
+RUN CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -extldflags '-static'" -installsuffix cgo -tags netgo -o api-gsc -v group/app.go
+RUN strip /app/api-gsc
+
+FROM scratch AS base
+LABEL name="api-gsc" \
+    version="0.1.17"
+WORKDIR /
+
+COPY --from=build /app/api-gsc ./
+
+CMD ["/api-gsc"]

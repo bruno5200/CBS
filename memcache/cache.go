@@ -78,6 +78,7 @@ func NewFromSelector(ss ServerSelector) *Client {
 	return &Client{selector: ss}
 }
 
+// Memcache consumer for connection of the memcache pool.
 type Client struct {
 	DialContext func(ctx context.Context, network, address string) (net.Conn, error)
 
@@ -87,15 +88,25 @@ type Client struct {
 
 	selector ServerSelector
 
-	mutx       sync.Mutex
+	mutx     sync.Mutex
 	freeconn map[string][]*conn
 }
 
+// Memcache store item in the memcache pool.
 type Item struct {
+	// Unique key of this item in the memcache pool. (limited to 250 bytes)
 	Key string
+
+	// Value of Item
 	Value []byte
+
+	// Flags are server-opaque 32-bit unsigned values set by the client.
 	Flags uint32
+
+	// Expiration time in seconds. (0 means never expire)
 	Expiration int32
+
+	// CasID is a unique 64-bit value set by the server when the item is stored.
 	CasID uint64
 }
 
@@ -203,7 +214,7 @@ func (c *Client) dial(addr net.Addr) (net.Conn, error) {
 	}
 
 	nc, err := dialerContext(ctx, addr.Network(), addr.String())
-	
+
 	if err == nil {
 		return nc, nil
 	}
@@ -257,7 +268,7 @@ func (c *Client) onItem(item *Item, fn func(*Client, *bufio.ReadWriter, *Item) e
 	}
 
 	defer cn.condRelease(&err)
-	
+
 	if err = fn(c, cn.rw, item); err != nil {
 		return err
 	}
@@ -270,7 +281,7 @@ func (c *Client) FlushAll() error {
 }
 
 func (c *Client) Get(key string) (item *Item, err error) {
-	
+
 	err = c.withKeyAddr(key, func(addr net.Addr) error {
 		return c.getFromAddr(addr, []string{key}, func(it *Item) { item = it })
 	})
@@ -390,7 +401,7 @@ func (c *Client) ping(addr net.Addr) error {
 		default:
 			return fmt.Errorf("memcache: unexpected response line from ping: %q", string(line))
 		}
-		
+
 		return nil
 	})
 }
