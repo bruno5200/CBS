@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS storage.groups (
 INSERT INTO storage.groups (
     group_id,
     group_name,
-    group_description
+    group_description,
+    group_service_id
 ) VALUES
 ('8a66950b-fbcb-4f9b-9361-86e8392e043f','Test','','cd05d13d-6555-42af-ae1e-dce46884d807');
 
@@ -70,6 +71,8 @@ BEGIN
         g.group_id,
         g.group_name,
         g.group_description,
+        s.service_id,
+        s.service_name
     FROM storage.groups AS g
     INNER JOIN storage.services AS s ON g.group_service_id = s.service_id
     WHERE group_id = _id;
@@ -88,7 +91,9 @@ CREATE OR REPLACE FUNCTION storage.fn_read_groups_by_service(
 RETURNS TABLE (
     id UUID,
     name TEXT,
-    description TEXT
+    description TEXT,
+    service_id UUID,
+    service_name TEXT
 )
 AS
 $BODY$
@@ -97,8 +102,11 @@ BEGIN
     SELECT
         g.group_id,
         g.group_name,
-        g.group_description
-    FROM storage.groups g
+        g.group_description,
+        s.service_id,
+        s.service_name
+    FROM storage.groups AS g
+    INNER JOIN storage.services AS s ON g.group_service_id = s.service_id
     WHERE b.group_service_id = _service_id
     AND g.state
     AND b.state
@@ -112,7 +120,8 @@ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION storage.fn_update_group(
     _id UUID,
     _name TEXT,
-    _description TEXT
+    _description TEXT,
+    _service_id UUID
 )
 RETURNS VOID
 AS
@@ -122,6 +131,7 @@ BEGIN
     SET
         group_name = _name,
         group_description = _description,
+        group_service_id = _service_id,
         updated_at = NOW()
     WHERE group_id = _id;
     IF NOT FOUND THEN
@@ -130,7 +140,7 @@ BEGIN
 END;
 $BODY$
 LANGUAGE plpgsql;
--- SELECT storage.fn_update_group('8a66950b-fbcb-4f9b-9361-86e8392e043f','Test','');
+-- SELECT storage.fn_update_group('8a66950b-fbcb-4f9b-9361-86e8392e043f','Test','','cd05d13d-6555-42af-ae1e-dce46884d807');
 
 -- Disable group
 CREATE OR REPLACE FUNCTION storage.fn_disable_group(

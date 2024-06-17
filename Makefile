@@ -129,6 +129,9 @@ dpush:
 # docker push $(REPO_NAME):latest
 	docker push $(REPO_NAME):$(TAG)
 
+dscan:
+	docker run -it --rm --name=osv-scanner -v ${PWD}:/src ghcr.io/google/osv-scanner -L /src/go.mod
+
 gpush:
 	docker build -t "us-central1-docker.pkg.dev/proyecto-egx/dev/edg:latest" .
 	docker push "us-central1-docker.pkg.dev/proyecto-egx/dev/edg:latest"

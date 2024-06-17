@@ -1,4 +1,4 @@
-FROM golang:1.22.3 AS build-back
+FROM golang:1.22.4 AS build-back
 
 RUN mkdir /app
 COPY . /app
