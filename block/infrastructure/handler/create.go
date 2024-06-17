@@ -94,7 +94,7 @@ func (h *blockHandler) Post(c *fiber.Ctx) error {
 		key = "document"
 	}
 
-	block := d.NewBlock(file.Filename, checksum, fmt.Sprintf("%s/%s", url, id), strings.ToUpper(strings.ReplaceAll(ext, ".", "")), id, groupId, serviceId)
+	block := d.NewBlock(file.Filename, checksum, fmt.Sprintf("%s/%s%s", url, id, ext), strings.ToUpper(strings.ReplaceAll(ext, ".", "")), id, groupId, serviceId)
 
 	filechan := make(chan string, 1)
 
@@ -182,7 +182,7 @@ func (h *blockHandler) PostParam(c *fiber.Ctx) error {
 
 	id := uuid.New()
 
-	block := d.NewBlock(fmt.Sprintf("%s.%s", blockRequest.Name, strings.ToLower(blockRequest.Extension)), checksum, fmt.Sprintf("%s/%s", url, id), strings.ToUpper(blockRequest.Extension), id, groupId, serviceId)
+	block := d.NewBlock(fmt.Sprintf("%s.%s", blockRequest.Name, strings.ToLower(blockRequest.Extension)), checksum, fmt.Sprintf("%s/%s%s", url, id, ext), strings.ToUpper(blockRequest.Extension), id, groupId, serviceId)
 
 	if err := client.NewClient().UploadToBlob(blockRequest.Content, url, key, fmt.Sprintf("%s%s", id, ext)); err != nil {
 		log.Printf("Error uploading to blob: %s", err)

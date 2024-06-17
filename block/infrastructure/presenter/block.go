@@ -1,15 +1,15 @@
 package presenter
 
-import "github.com/bruno5200/CSM/block/domain"
+import d "github.com/bruno5200/CSM/block/domain"
 
-func BlockSuccessResponse(block *domain.Block) map[string]interface{} {
+func BlockSuccessResponse(block *d.Block) map[string]interface{} {
 	return map[string]interface{}{
 		"block":   block,
 		"success": true,
 	}
 }
 
-func BlocksSuccessResponse(blocks []domain.Block) map[string]interface{} {
+func BlocksSuccessResponse(blocks []d.Block) map[string]interface{} {
 	return map[string]interface{}{
 		"blocks":  blocks,
 		"success": true,
