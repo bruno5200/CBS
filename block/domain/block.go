@@ -14,10 +14,12 @@ const (
 )
 
 var (
+	ErrInvalidBlockId       = errors.New("invalid block id")
 	ErrInvalidFileExtension = errors.New("invalid file extension")
 	ErrInvalidServiceId     = errors.New("invalid service id")
 	ErrInvalidGroupId       = errors.New("invalid group id")
 	ErrMalformedFormKey     = errors.New("form key must be 'file'")
+	ErrGettingBlock         = errors.New("error getting block")
 )
 
 func UnmarshalBlock(data []byte) (*Block, error) {

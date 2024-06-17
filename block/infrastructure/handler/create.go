@@ -75,7 +75,7 @@ func (h *blockHandler) Post(c *fiber.Ctx) error {
 	log.Printf("Checksum: %s", checksum)
 
 	if block, err := h.BlockService.GetBlockByCheksum(checksum); err == nil {
-		return c.Status(fiber.StatusAccepted).JSON(p.BlockCreateResponse(fmt.Sprintf("%s/%s", e.GetUrl(), block.Id)))
+		return c.Status(fiber.StatusAccepted).JSON(p.BlockCreateResponse(fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), block.Id)))
 	} else {
 		log.Printf("DB: %s", err)
 	}
@@ -109,14 +109,12 @@ func (h *blockHandler) Post(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(p.BlockErrorResponse(err))
 	}
 
-	location := fmt.Sprintf("%s/%s", e.GetUrl(), block.Id)
-
 	if err := h.BlockService.CreateBlock(block); err != nil {
 		log.Printf("DB: %s", err)
 		return c.Status(fiber.StatusNotFound).JSON(p.BlockErrorResponse(err))
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(p.BlockCreateResponse(location))
+	return c.Status(fiber.StatusCreated).JSON(p.BlockCreateResponse(fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), block.Id)))
 }
 
 func (h *blockHandler) PostParam(c *fiber.Ctx) error {
@@ -163,7 +161,7 @@ func (h *blockHandler) PostParam(c *fiber.Ctx) error {
 
 	if block, err := h.BlockService.GetBlockByCheksum(checksum); err == nil {
 		log.Printf("File already exists: %s", block.Id)
-		return c.Status(fiber.StatusAccepted).JSON(p.BlockCreateResponse(fmt.Sprintf("%s/%s", e.GetUrl(), block.Id)))
+		return c.Status(fiber.StatusAccepted).JSON(p.BlockCreateResponse(fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), block.Id)))
 	}
 
 	ext := strings.ToLower(blockRequest.Extension)
@@ -186,8 +184,6 @@ func (h *blockHandler) PostParam(c *fiber.Ctx) error {
 
 	block := d.NewBlock(fmt.Sprintf("%s.%s", blockRequest.Name, strings.ToLower(blockRequest.Extension)), checksum, fmt.Sprintf("%s/%s", url, id), strings.ToUpper(blockRequest.Extension), id, groupId, serviceId)
 
-	location := fmt.Sprintf("%s/%s", e.GetUrl(), block.Id)
-
 	if err := client.NewClient().UploadToBlob(blockRequest.Content, url, key, fmt.Sprintf("%s%s", id, ext)); err != nil {
 		log.Printf("Error uploading to blob: %s", err)
 		return c.Status(fiber.StatusBadRequest).JSON(p.BlockErrorResponse(err))
@@ -198,5 +194,5 @@ func (h *blockHandler) PostParam(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(p.BlockErrorResponse(err))
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(p.BlockCreateResponse(location))
+	return c.Status(fiber.StatusCreated).JSON(p.BlockCreateResponse(fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), block.Id)))
 }
