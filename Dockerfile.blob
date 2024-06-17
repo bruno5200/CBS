@@ -8,7 +8,7 @@ RUN strip api-blob
 
 FROM scratch
 LABEL name="blob" \
-	version="0.1.15"
+	version="0.1.16"
 WORKDIR /
 
 COPY --from=build-back /app/api-blob ./

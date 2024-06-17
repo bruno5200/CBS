@@ -45,10 +45,10 @@ func (e *environment) GetPort() (val string) {
 
 // `URL`: Dirección url con la que se envia los correos.
 //
-// Por defecto es `https://dev-bsc-2d7ukhlbva-uc.a.run.app`.
+// Por defecto es `https://dev-bsc-2d7ukhlbva-tl.a.run.app`.
 func (e *environment) GetUrl() (val string) {
 	if !e.urlOK {
-		val = "https://dev-bsc-2d7ukhlbva-uc.a.run.app"
+		val = "https://dev-bsc-2d7ukhlbva-tl.a.run.app"
 	} else {
 		val = e.url
 	}

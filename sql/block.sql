@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS storage.blocks (
 -- Functions for blocks management
 
 -- Create block
-CREATE OR REPLACE FUNCTION storage.create_block(
-	_id
+CREATE OR REPLACE FUNCTION storage.fn_create_block(
+	_id UUID,
 	_name TEXT,
 	_checksum TEXT,
 	_extension TEXT,
@@ -29,7 +29,7 @@ CREATE OR REPLACE FUNCTION storage.create_block(
 AS
 $BODY$
 BEGIN
-	INSERT INTO (
+	INSERT INTO storage.blocks(
 		block_id,
 		block_name,
 		block_checksum,
@@ -52,115 +52,202 @@ BEGIN
 END;
 $BODY$
 LANGUAGE plpgsql;
+-- SELECT storage.fn_create_block('9add6cca-25f8-4657-8e88-0bf7f9a12cbb','reporte_solicitudes_01_12_2023_31_12_2023.csv','3d7907504faa776990fa9c01e3ff2dd1ae391890b972bca664366b59cbc5b53c','CSV','https://blob.gutier.lat/documents/9add6cca-25f8-4657-8e88-0bf7f9a12cbb.csv','8a66950b-fbcb-4f9b-9361-86e8392e043f','cd05d13d-6555-42af-ae1e-dce46884d807');
 
 -- Read block
-CREATE OR REPLACE FUNCTION storage.read_block(
+CREATE OR REPLACE FUNCTION storage.fn_read_block(
 	_id UUID
 )
 RETURNS TABLE (
-	_id UUID,
-	_name TEXT,
-	_checksum TEXT,
-	_extension TEXT,
-	_url TEXT,
-	_group_id UUID,
-	_service_id UUID
+	id UUID,
+	name TEXT,
+	checksum TEXT,
+	extension TEXT,
+	url TEXT,
+	at TIMESTAMPTZ,
+	group_id UUID,
+	group_name TEXT,
+	service_id UUID,
+	service_name TEXT,
+	active BOOLEAN
 )
 AS
 $BODY$
 BEGIN
 	RETURN QUERY SELECT
-		block_id,
-		block_name,
-		block_checksum,
-		block_extension,
-		block_url,
-		block_group_id,
-		block_service_id
-	FROM storage.blocks
-	WHERE block_id = _id;
+	b.block_id,
+	b.block_name,
+	b.block_checksum,
+	b.block_extension,
+	b.block_url,
+	b.block_uploaded_at,
+	b.block_group_id,
+	g.group_name,
+	b.block_service_id,
+	s.service_name,
+	b.state
+	FROM storage.blocks AS b
+	INNER JOIN storage.groups g ON b.block_group_id = g.group_id
+	INNER JOIN storage.services s ON b.block_service_id = s.service_id
+	WHERE block_id = _id
+	AND g.state
+	AND s.state;
 	IF NOT FOUND THEN
 		RAISE EXCEPTION 'Block not found';
 	END IF;
 END;
 $BODY$
 LANGUAGE plpgsql;
+-- SELECT id, name, checksum, extension, url, at, group_id, group_name, service_id, service_name, active FROM storage.fn_read_block('9add6cca-25f8-4657-8e88-0bf7f9a12cbb');
+
+-- Read Block by Checksum
+CREATE OR REPLACE FUNCTION storage.fn_read_block_by_checksum(
+	_checksum TEXT
+)
+RETURNS TABLE (
+	id UUID,
+	name TEXT,
+	checksum TEXT,
+	extension TEXT,
+	url TEXT,
+	at TIMESTAMPTZ,
+	group_id UUID,
+	group_name TEXT,
+	service_id UUID,
+	service_name TEXT,
+	active BOOLEAN
+)
+AS
+$BODY$
+BEGIN
+	RETURN QUERY SELECT
+	b.block_id,
+	b.block_name,
+	b.block_checksum,
+	b.block_extension,
+	b.block_url,
+	b.block_uploaded_at,
+	b.block_group_id,
+	g.group_name,
+	b.block_service_id,
+	s.service_name,
+	b.state
+	FROM storage.blocks AS b
+	INNER JOIN storage.groups g ON b.block_group_id = g.group_id
+	INNER JOIN storage.services s ON b.block_service_id = s.service_id
+	WHERE block_checksum = _checksum
+	AND g.state
+	AND s.state;
+	IF NOT FOUND THEN
+		RAISE EXCEPTION 'Block not found';
+	END IF;
+END;
+$BODY$
+LANGUAGE plpgsql;
+-- SELECT id, name, checksum, extension, url, at, group_id, group_name, service_id, service_name, active FROM storage.fn_read_block_by_checksum('3d7907504faa776990fa9c01e3ff2dd1ae391890b972bca664366b59cbc5b53c');
 
 -- Read Blocks by Group
-CREATE OR REPLACE FUNCTION storage.read_blocks_by_group(
+CREATE OR REPLACE FUNCTION storage.fn_read_blocks_by_group(
 	_group_id UUID
 )
 RETURNS TABLE (
-	_id UUID,
-	_name TEXT,
-	_checksum TEXT,
-	_extension TEXT,
-	_url TEXT,
-	_group_id UUID,
-	_service_id UUID
+	id UUID,
+	name TEXT,
+	checksum TEXT,
+	extension TEXT,
+	url TEXT,
+	at TIMESTAMPTZ,
+	group_id UUID,
+	group_name TEXT,
+	service_id UUID,
+	service_name TEXT,
+	active BOOLEAN
 )
 AS
 $BODY$
 BEGIN
 	RETURN QUERY SELECT
-		block_id,
-		block_name,
-		block_checksum,
-		block_extension,
-		block_url,
-		block_group_id,
-		block_service_id
-	FROM storage.blocks
-	WHERE block_group_id = _group_id;
+	b.block_id,
+	b.block_name,
+	b.block_checksum,
+	b.block_extension,
+	b.block_url,
+	b.block_uploaded_at,
+	b.block_group_id,
+	g.group_name,
+	b.block_service_id,
+	s.service_name,
+	b.state
+	FROM storage.blocks AS b
+	INNER JOIN storage.groups g ON b.block_group_id = g.group_id
+	INNER JOIN storage.services s ON b.block_service_id = s.service_id
+	WHERE block_group_id = _group_id
+	AND g.state
+	AND s.state;
 	IF NOT FOUND THEN
 		RAISE EXCEPTION 'Blocks not found';
 	END IF;
 END;
 $BODY$
 LANGUAGE plpgsql;
+-- SELECT id, name, checksum, extension, url, at, group_id, group_name, service_id, service_name, active FROM storage.fn_read_blocks_by_group('8a66950b-fbcb-4f9b-9361-86e8392e043f');
 
 -- Read Blocks by Service
-CREATE OR REPLACE FUNCTION storage.read_blocks_by_service(
+CREATE OR REPLACE FUNCTION storage.fn_read_blocks_by_service(
 	_service_id UUID
 )
 RETURNS TABLE (
-	_id UUID,
-	_name TEXT,
-	_checksum TEXT,
-	_extension TEXT,
-	_url TEXT,
-	_group_id UUID,
-	_service_id UUID
+	id UUID,
+	name TEXT,
+	checksum TEXT,
+	extension TEXT,
+	url TEXT,
+	at TIMESTAMPTZ,
+	group_id UUID,
+	group_name TEXT,
+	service_id UUID,
+	service_name TEXT,
+	active BOOLEAN
 )
 AS
 $BODY$
 BEGIN
 	RETURN QUERY SELECT
-		block_id,
-		block_name,
-		block_checksum,
-		block_extension,
-		block_url,
-		block_group_id,
-		block_service_id
-	FROM storage.blocks
-	WHERE block_service_id = _service_id;
+	b.block_id,
+	b.block_name,
+	b.block_checksum,
+	b.block_extension,
+	b.block_url,
+	b.block_uploaded_at,
+	b.block_group_id,
+	g.group_name,
+	b.block_service_id,
+	s.service_name,
+	b.state
+	FROM storage.blocks AS b
+	INNER JOIN storage.groups g ON b.block_group_id = g.group_id
+	INNER JOIN storage.services s ON b.block_service_id = s.service_id
+	WHERE block_service_id = _service_id
+	AND g.state
+	AND s.state;
 	IF NOT FOUND THEN
 		RAISE EXCEPTION 'Blocks not found';
 	END IF;
 END;
 $BODY$
 LANGUAGE plpgsql;
+-- SELECT id, name, checksum, extension, url, at, group_id, group_name, service_id, service_name, active FROM storage.fn_read_blocks_by_service('cd05d13d-6555-42af-ae1e-dce46884d807');
 
 -- Update block
-CREATE OR REPLACE FUNCTION storage.update_block(
+CREATE OR REPLACE FUNCTION storage.fn_update_block(
 	_id UUID,
 	_name TEXT,
 	_checksum TEXT,
 	_extension TEXT,
 	_url TEXT,
 	_group_id UUID,
-	_service_id UUID
+	_service_id UUID,
+	_active BOOLEAN
 )
 RETURNS VOID
 AS
@@ -173,7 +260,8 @@ BEGIN
 		block_extension = _extension,
 		block_url = _url,
 		block_group_id = _group_id,
-		block_service_id = _service_id
+		block_service_id = _service_id,
+		active = _active
 	WHERE block_id = _id;
 	IF NOT FOUND THEN
 		RAISE EXCEPTION 'Block not updated';
@@ -181,19 +269,23 @@ BEGIN
 END;
 $BODY$
 LANGUAGE plpgsql;
+-- SELECT storage.fn_update_block('9add6cca-25f8-4657-8e88-0bf7f9a12cbb','reporte_solicitudes_01_12_2023_31_12_2023.csv','3d7907504faa776990fa9c01e3ff2dd1ae391890b972bca664366b59cbc5b53c','CSV','https://blob.gutier.lat/documents/9add6cca-25f8-4657-8e88-0bf7f9a12cbb.csv','8a66950b-fbcb-4f9b-9361-86e8392e043f','cd05d13d-6555-42af-ae1e-dce46884d807',TRUE);
 
 -- Disable block
-CREATE OR REPLACE FUNCTION storage.disable_block(
+CREATE OR REPLACE FUNCTION storage.fn_disable_block(
 	_id UUID
 )
 RETURNS VOID
 AS
 $BODY$
 BEGIN
-	UPDATE storage.blocks
-	SET state = FALSE
+	UPDATE storage.blocks SET
+	state = FALSE
 	WHERE block_id = _id;
 	IF NOT FOUND THEN
 		RAISE EXCEPTION 'Block not disabled';
 	END IF;
 END;
+$BODY$
+LANGUAGE plpgsql;
+-- SELECT storage.fn_disable_block('9add6cca-25f8-4657-8e88-0bf7f9a12cbb');

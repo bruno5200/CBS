@@ -119,7 +119,7 @@ func (h *blockHandler) Post(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(p.BlockCreateResponse(location))
 }
 
-func (h *blockHandler) Json(c *fiber.Ctx) error {
+func (h *blockHandler) PostParam(c *fiber.Ctx) error {
 
 	serviceId, err := uuid.Parse(utils.CopyString(c.Get(d.HeaderServiceId)))
 

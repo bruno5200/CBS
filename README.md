@@ -27,3 +27,10 @@ To run the database in a docker container, use the following command:
 ```bash
 docker run -dp 5432:5432 --name=db -e POSTGRES_PASSWORD=lEy9gfGEqbdYxl1fWcqd -e POSTGRES_DB=vault -v ./vault-db:/var/lib/postgresql/data postgres:alpine
 ```
+
+## Memcached Docker (Required)
+
+To run the Memcached server in a docker container, use the following command:
+```bash
+docker run -dp 11211:11211 --name=memcached memcached:1.6.28-alpine -p 11211 -m 64 -vv
+```

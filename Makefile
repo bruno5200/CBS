@@ -16,7 +16,7 @@ IP=127.0.0.1
 URL=https://$(IP):$(PORT)
 EXPOSE=$(IP):$(PORT):$(PORT) 
 REPO_NAME=tobias0406/$(BINARY_NAME)
-TAG=0.1.0
+TAG=0.1.17
 
 # muestra el log de github (no añadir | head -n 10 | tail -n 5 | sed 's/^/  /')
 log:
@@ -101,7 +101,8 @@ dbuildprod:
 
 # hace el build y el push de la imagen Docker en arquitecturas diferentes
 dbuildpush:
-	docker buildx build --platform linux/amd64 -t $(REPO_NAME):$(TAG) --push .
+#	docker buildx build --platform linux/amd64 -t $(REPO_NAME):$(TAG) --push .
+	docker buildx build --platform linux/amd64 -t tobias0406/blob:$(TAG) -f ./Dockerfile.blob --push .
 #	docker buildx build --platform ,linux/arm64 -t $(REPO_NAME) -t $(REPO_NAME):$(TAG) --push .
 
 drun:

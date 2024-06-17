@@ -1,0 +1,12 @@
+.vscode/
+.github/
+docs/
+sql/
+vault-db/
+.dockerignore
+.gitignore
+csm.yaml
+docker-compose.yml
+Dockerfile
+makecert.sh
+README.md

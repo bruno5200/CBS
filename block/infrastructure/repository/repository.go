@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	psqlCreateBLock         = `SELECT storage.fn_create_block($1, $2, $3, $4, $5);`
+	psqlCreateBLock         = `SELECT storage.fn_create_block($1, $2, $3, $4, $5, $6);`
 	psqlReadBlock           = `SELECT id, name, checksum, extension, url, at, group_id, group_name, service_id, service_name, active FROM storage.fn_read_block($1);`
 	psqlReadBlockByCheksum  = `SELECT id, name, checksum, extension, url, at, group_id, group_name, service_id, service_name, active FROM storage.fn_read_block_by_checksum($1);`
 	psqlReadBlocksByGroup   = `SELECT id, name, checksum, extension, url, at, group_id, group_name, service_id, service_name, active FROM storage.fn_read_blocks_by_group($1);`
@@ -116,8 +116,8 @@ func (r *blockRepository) ReadBlocksByService(serviceId uuid.UUID) (*[]d.Block, 
 
 func (r *blockRepository) UpdateBlock(b *d.Block) error {
 
-	log.Printf("DB: PSQL, F: storage.fn_update_block('%s', '%s', '%s', '%s', '%s', %t), O:UPDATE, T: storage.block", b.Id, b.Name, b.GroupId, b.ServiceId, b.Url, b.Active)
-	_, err := r.db.Exec(psqlUpdateBlock, b.Id, b.Name, b.GroupId, b.ServiceId, b.Url, b.Active)
+	log.Printf("DB: PSQL, F: storage.fn_update_block('%s', '%s', '%s', '%s', '%s', '%s', '%s', %t), O:UPDATE, T: storage.block", b.Id, b.Name, b.Checksum, b.Extension, b.Url, b.GroupId, b.ServiceId, b.Active)
+	_, err := r.db.Exec(psqlUpdateBlock, b.Id, b.Name, b.Checksum, b.Extension, b.Url, b.GroupId, b.ServiceId, b.Active)
 
 	return err
 }

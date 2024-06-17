@@ -10,13 +10,14 @@ import (
 
 func BlockRouter(app fiber.Router, h a.BlockHandler) {
 	block := app.Group("api/v1/")
-	block.Get("block/", h.Get)
+	block.Get("block/:id", h.Get)
+	block.Get("block/:id.:format", h.GetParam)
 	block.Get("block/group/:id", h.GetByGroup)
 	block.Get("block/service/:id", h.GetByService)
 	block.Post("upload/:groupId.:format", m.ApiKey(), func(c *fiber.Ctx) error {
 		return c.SendString(fmt.Sprintf("Group: %s, Format:%s", c.Params("groupId"), c.Params("format")))
 	})
-	block.Post("block/:groupId.:format", m.ApiKey(), h.Json)
+	block.Post("block/:groupId.:format", m.ApiKey(), h.PostParam)
 	block.Post("block/:groupId", m.ApiKey(), h.Post)
 	block.Put("block/:id", m.ApiKey(), h.Put)
 	block.Delete("block/:id", m.ApiKey(), h.Delete)
