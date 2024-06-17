@@ -22,14 +22,14 @@ func (h *blockHandler) Post(c *fiber.Ctx) error {
 
 	if err != nil {
 		log.Printf("Error parsing serviceId: %s", err)
-		return c.Status(fiber.StatusBadRequest).JSON(p.BlockErrorResponse(d.ErrInvalidServiceId))
+		return c.Status(fiber.StatusBadRequest).JSON(p.BlockErrorResponse(d.ErrInvalidBlockServiceId))
 	}
 
 	groupId, err := uuid.Parse(c.Params("groupId"))
 
 	if err != nil {
 		log.Printf("Error parsing groupId: %s", err)
-		return c.Status(fiber.StatusBadRequest).JSON(p.BlockErrorResponse(d.ErrInvalidGroupId))
+		return c.Status(fiber.StatusBadRequest).JSON(p.BlockErrorResponse(d.ErrInvalidBlockGroupId))
 	}
 
 	file, err := c.FormFile("file")
@@ -76,8 +76,6 @@ func (h *blockHandler) Post(c *fiber.Ctx) error {
 
 	if block, err := h.BlockService.GetBlockByCheksum(checksum); err == nil {
 		return c.Status(fiber.StatusAccepted).JSON(p.BlockCreateResponse(fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), block.Id)))
-	} else {
-		log.Printf("DB: %s", err)
 	}
 
 	var url, key string
@@ -110,7 +108,6 @@ func (h *blockHandler) Post(c *fiber.Ctx) error {
 	}
 
 	if err := h.BlockService.CreateBlock(block); err != nil {
-		log.Printf("DB: %s", err)
 		return c.Status(fiber.StatusNotFound).JSON(p.BlockErrorResponse(err))
 	}
 
@@ -123,14 +120,14 @@ func (h *blockHandler) PostParam(c *fiber.Ctx) error {
 
 	if err != nil {
 		log.Printf("Error parsing serviceId: %s", err)
-		return c.Status(fiber.StatusBadRequest).JSON(p.BlockErrorResponse(d.ErrInvalidServiceId))
+		return c.Status(fiber.StatusBadRequest).JSON(p.BlockErrorResponse(d.ErrInvalidBlockServiceId))
 	}
 
 	groupId, err := uuid.Parse(c.Params("groupId"))
 
 	if err != nil {
 		log.Printf("Error parsing groupId: %s", err)
-		return c.Status(fiber.StatusBadRequest).JSON(p.BlockErrorResponse(d.ErrInvalidGroupId))
+		return c.Status(fiber.StatusBadRequest).JSON(p.BlockErrorResponse(d.ErrInvalidBlockGroupId))
 	}
 
 	blockRequest, err := d.UnmarshalBlockRequest(c.Body())
@@ -190,7 +187,6 @@ func (h *blockHandler) PostParam(c *fiber.Ctx) error {
 	}
 
 	if err := h.BlockService.CreateBlock(block); err != nil {
-		log.Printf("DB: %s", err)
 		return c.Status(fiber.StatusNotFound).JSON(p.BlockErrorResponse(err))
 	}
 

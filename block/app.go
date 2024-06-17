@@ -13,6 +13,7 @@ import (
 	"github.com/bruno5200/CSM/block/router"
 	db "github.com/bruno5200/CSM/database"
 	"github.com/bruno5200/CSM/env"
+	"github.com/bruno5200/CSM/memcache"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
@@ -29,6 +30,8 @@ func init() { env.Init() }
 func main() {
 
 	go db.NewPostgresDB()
+
+	mc := memcache.New("lab-cache.gutier.lat:80")
 
 	app := fiber.New(fiber.Config{
 		DisableStartupMessage: true,
@@ -47,11 +50,11 @@ func main() {
 	app.Use(requestid.New())
 
 	app.Get("/metrics", monitor.New(monitor.Config{
-		Title:   "IDC API Metrics",
+		Title:   "Block API Metrics",
 		Refresh: 2 * time.Second,
 	}))
 
-	router.BlockRouter(app, h.NewBlockHandler(a.NewBlockService(r.NewBlockRepository(db.PostgresDB()))))
+	router.BlockRouter(app, h.NewBlockHandler(a.NewBlockService(r.NewBlockRepository(db.PostgresDB()), mc)))
 
 	app.Get("/*", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).SendString(`<h1>404 No Encontrado</h1>`)

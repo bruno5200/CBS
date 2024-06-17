@@ -9,7 +9,7 @@ func BlockSuccessResponse(block *d.Block) map[string]interface{} {
 	}
 }
 
-func BlocksSuccessResponse(blocks []d.Block) map[string]interface{} {
+func BlocksSuccessResponse(blocks *[]d.Block) map[string]interface{} {
 	return map[string]interface{}{
 		"blocks":  blocks,
 		"success": true,

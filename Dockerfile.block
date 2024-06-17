@@ -8,7 +8,7 @@ RUN strip /app/api-bsc
 
 FROM scratch AS base
 LABEL name="api-bsc" \
-    version="0.1.0"
+    version="0.1.17"
 WORKDIR /
 
 COPY --from=build /app/api-bsc ./

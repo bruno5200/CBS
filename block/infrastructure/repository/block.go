@@ -10,12 +10,12 @@ import (
 )
 
 const (
-	psqlCreateBLock         = `SELECT storage.fn_create_block($1, $2, $3, $4, $5, $6);`
+	psqlCreateBlock         = `SELECT storage.fn_create_block($1, $2, $3, $4, $5);`
 	psqlReadBlock           = `SELECT id, name, checksum, extension, url, at, group_id, group_name, service_id, service_name, active FROM storage.fn_read_block($1);`
 	psqlReadBlockByCheksum  = `SELECT id, name, checksum, extension, url, at, group_id, group_name, service_id, service_name, active FROM storage.fn_read_block_by_checksum($1);`
 	psqlReadBlocksByGroup   = `SELECT id, name, checksum, extension, url, at, group_id, group_name, service_id, service_name, active FROM storage.fn_read_blocks_by_group($1);`
 	psqlReadBlocksByService = `SELECT id, name, checksum, extension, url, at, group_id, group_name, service_id, service_name, active FROM storage.fn_read_blocks_by_service($1);`
-	psqlUpdateBlock         = `SELECT storage.fn_update_block($1, $2, $3, $4, $5, $6);`
+	psqlUpdateBlock         = `SELECT storage.fn_update_block($1, $2, $3, $4, $5, $6, $7);`
 	psqlDeleteBlock         = `SELECT storage.fn_delete_block($1);`
 )
 
@@ -43,8 +43,8 @@ func NewBlockRepository(db *sql.DB) *blockRepository {
 
 func (r *blockRepository) CreateBlock(b *d.Block) error {
 
-	log.Printf("DB: PSQL, F: storage.fn_create_block('%s', '%s', '%s', '%s', '%s', '%s'), O:INSERT, T: storage.block", b.Id, b.Name, b.Checksum, b.GroupId, b.ServiceId, b.Url)
-	_, err := r.db.Exec(psqlCreateBLock, b.Id, b.Name, b.Checksum, b.GroupId, b.ServiceId, b.Url)
+	log.Printf("DB: PSQL, F: storage.fn_create_block('%s', '%s', '%s', '%s', '%s'), O:INSERT, T: storage.block", b.Id, b.Name, b.Checksum, b.GroupId, b.Url)
+	_, err := r.db.Exec(psqlCreateBlock, b.Id, b.Name, b.Checksum, b.GroupId, b.Url)
 
 	return err
 
@@ -116,8 +116,8 @@ func (r *blockRepository) ReadBlocksByService(serviceId uuid.UUID) (*[]d.Block, 
 
 func (r *blockRepository) UpdateBlock(b *d.Block) error {
 
-	log.Printf("DB: PSQL, F: storage.fn_update_block('%s', '%s', '%s', '%s', '%s', '%s', '%s', %t), O:UPDATE, T: storage.block", b.Id, b.Name, b.Checksum, b.Extension, b.Url, b.GroupId, b.ServiceId, b.Active)
-	_, err := r.db.Exec(psqlUpdateBlock, b.Id, b.Name, b.Checksum, b.Extension, b.Url, b.GroupId, b.ServiceId, b.Active)
+	log.Printf("DB: PSQL, F: storage.fn_update_block('%s', '%s', '%s', '%s', '%s', '%s', %t), O:UPDATE, T: storage.block", b.Id, b.Name, b.Checksum, b.Extension, b.Url, b.GroupId, b.Active)
+	_, err := r.db.Exec(psqlUpdateBlock, b.Id, b.Name, b.Checksum, b.Extension, b.Url, b.GroupId, b.Active)
 
 	return err
 }

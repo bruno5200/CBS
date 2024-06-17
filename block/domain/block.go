@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/bruno5200/CSM/memcache"
 	"github.com/google/uuid"
 )
 
@@ -14,18 +15,45 @@ const (
 )
 
 var (
-	ErrInvalidBlockId       = errors.New("invalid block id")
-	ErrInvalidFileExtension = errors.New("invalid file extension")
-	ErrInvalidServiceId     = errors.New("invalid service id")
-	ErrInvalidGroupId       = errors.New("invalid group id")
-	ErrMalformedFormKey     = errors.New("form key must be 'file'")
-	ErrGettingBlock         = errors.New("error getting block")
+	ErrInvalidBlockId        = errors.New("invalid block id")         // invalid block id
+	ErrInvalidFileExtension  = errors.New("invalid file extension")   // invalid file extension
+	ErrInvalidBlockServiceId = errors.New("invalid block service id") // invalid block service id
+	ErrInvalidBlockGroupId   = errors.New("invalid block group id")   // invalid block group id
+	ErrMalformedFormKey      = errors.New("form key must be 'file'")  // form key must be 'file'
+	ErrGettingBlock          = errors.New("error getting block")      // error getting block
+	ErrBlockNotFound         = errors.New("Block not found")          // Block not found
+	ErrNotBlocks             = errors.New("no blocks found")          // no blocks found
+	ErrCreatingBlock         = errors.New("error creating block")     // error creating block
 )
 
 func UnmarshalBlock(data []byte) (*Block, error) {
 	var b Block
 	err := json.Unmarshal(data, &b)
 	return &b, err
+}
+
+func (b *Block) Marshal() ([]byte, error) {
+	return json.Marshal(b)
+}
+
+// Item returns an item with the block id as the key
+func (b *Block) Item() *memcache.Item {
+	data, _ := b.Marshal()
+	return &memcache.Item{
+		Key:        b.Id.String(),
+		Value:      data,
+		Expiration: int32(time.Now().AddDate(0, 1, 0).Unix() - time.Now().Unix()),
+	}
+}
+
+// ItemCheksum returns an item with the checksum as the key
+func (b *Block) ItemCheksum() *memcache.Item {
+	data, _ := b.Marshal()
+	return &memcache.Item{
+		Key:        b.Checksum,
+		Value:      data,
+		Expiration: int32(time.Now().AddDate(0, 1, 0).Unix() - time.Now().Unix()),
+	}
 }
 
 type Block struct {

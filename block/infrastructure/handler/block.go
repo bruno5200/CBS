@@ -23,7 +23,6 @@ func (h *blockHandler) Get(c *fiber.Ctx) error {
 	block, err := h.BlockService.GetBlock(id)
 
 	if err != nil {
-		log.Printf("DB: %s", err)
 		return c.Status(fiber.StatusNotFound).JSON(p.BlockErrorResponse(d.ErrGettingBlock))
 	}
 
@@ -51,7 +50,6 @@ func (h *blockHandler) GetParam(c *fiber.Ctx) error {
 	block, err := h.BlockService.GetBlock(id)
 
 	if err != nil {
-		log.Printf("DB: %s", err)
 		return c.Status(fiber.StatusNotFound).JSON(p.BlockErrorResponse(err))
 	}
 
