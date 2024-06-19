@@ -50,13 +50,15 @@ func (r *groupRepository) ReadGroup(id uuid.UUID) (*d.Group, error) {
 	g := groupDB{}
 
 	log.Printf("DB: PSQL, F: storage.fn_read_group('%s'), O:SELECT, T: storage.group", id)
-	err := r.db.QueryRow(psqlReadGroup, id).Scan(&g.Id, &g.Name, &g.ServiceId, &g.ServiceName, &g.Active)
+	if err := r.db.QueryRow(psqlReadGroup, id).Scan(&g.Id, &g.Name, &g.ServiceId, &g.ServiceName, &g.Active); err != nil {
+		return nil, err
+	}
 
 	group := pointerGroup(group(g))
 
 	group.Blocks, _ = rb.NewBlockRepository(r.db).ReadBlocksByGroup(id)
 
-	return group, err
+	return group, nil
 }
 
 func (r *groupRepository) ReadGroupsByService(id uuid.UUID) (*[]d.Group, error) {
@@ -65,9 +67,11 @@ func (r *groupRepository) ReadGroupsByService(id uuid.UUID) (*[]d.Group, error) 
 
 	log.Printf("DB: PSQL, F: storage.fn_read_groups_by_service('%s'), O:SELECT, T: storage.group", id)
 	rows, err := r.db.Query(psqlReadGroupsByServiceKey, id)
+
 	if err != nil {
 		return nil, err
 	}
+	
 	defer rows.Close()
 
 	for rows.Next() {

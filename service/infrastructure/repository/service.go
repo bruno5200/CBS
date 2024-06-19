@@ -80,9 +80,11 @@ func (r *serviceRepository) ReadServiceByName(name string) (*d.Service, error) {
 	s := serviceDB{}
 
 	log.Printf("DB: PSQL, F: storage.fn_read_service_by_name('%s'), O:SELECT, T: storage.service", name)
-	err := r.db.QueryRow(psqlReadServiceByName, name).Scan(&s.Id, &s.Name, &s.Description, &s.Active)
+	if err := r.db.QueryRow(psqlReadServiceByName, name).Scan(&s.Id, &s.Name, &s.Description, &s.Active); err != nil {
+		return nil, err
+	}
 
-	return pointerService(service(s)), err
+	return pointerService(service(s)), nil
 }
 
 func (r *serviceRepository) ReadServiceByKey(key string) (*d.Service, error) {

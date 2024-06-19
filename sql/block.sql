@@ -96,8 +96,7 @@ BEGIN
 	INNER JOIN storage.groups g ON b.block_group_id = g.group_id
 	INNER JOIN storage.services s ON g.group_service_id = s.service_id
 	WHERE b.block_id = _id
-	AND g.state
-	AND s.state;
+	AND g.state;
 	IF NOT FOUND THEN
 		RAISE EXCEPTION 'Block not found';
 	END IF;
@@ -142,8 +141,7 @@ BEGIN
 	INNER JOIN storage.groups g ON b.block_group_id = g.group_id
 	INNER JOIN storage.services s ON g.group_service_id = s.service_id
 	WHERE b.block_checksum = _checksum
-	AND g.state
-	AND s.state;
+	AND g.state;
 	IF NOT FOUND THEN
 		RAISE EXCEPTION 'Block not found';
 	END IF;
@@ -188,8 +186,7 @@ BEGIN
 	INNER JOIN storage.groups g ON b.block_group_id = g.group_id
 	INNER JOIN storage.services s ON g.group_service_id = s.service_id
 	WHERE g.group_id = _group_id
-	AND g.state
-	AND s.state;
+	AND g.state;
 	IF NOT FOUND THEN
 		RAISE EXCEPTION 'Blocks not found';
 	END IF;
@@ -234,8 +231,7 @@ BEGIN
 	INNER JOIN storage.groups g ON b.block_group_id = g.group_id
 	INNER JOIN storage.services s ON g.group_service_id = s.service_id
 	WHERE s.service_id = _service_id
-	AND g.state
-	AND s.state;
+	AND g.state;
 	IF NOT FOUND THEN
 		RAISE EXCEPTION 'Blocks not found';
 	END IF;
@@ -258,15 +254,16 @@ RETURNS VOID
 AS
 $BODY$
 BEGIN
-	UPDATE storage.blocks
+	UPDATE storage.blocks AS b
 	SET
 		block_name = _name,
 		block_checksum = _checksum,
 		block_extension = _extension,
 		block_url = _url,
 		block_group_id = _group_id,
-		active = _active
-	WHERE block_id = _id;
+		state = _active
+	WHERE b.block_id = _id
+	AND b.state;
 	IF NOT FOUND THEN
 		RAISE EXCEPTION 'Block not updated';
 	END IF;
@@ -283,9 +280,10 @@ RETURNS VOID
 AS
 $BODY$
 BEGIN
-	UPDATE storage.blocks SET
+	UPDATE storage.blocks AS b SET
 	state = FALSE
-	WHERE block_id = _id;
+	WHERE b.block_id = _id
+	AND b.state;
 	IF NOT FOUND THEN
 		RAISE EXCEPTION 'Block not disabled';
 	END IF;

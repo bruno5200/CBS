@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS storage.groups (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ,
     delete_at TIMESTAMPTZ,
-    state BOOLEAN NOT NULL DEFAULT TRUE,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
     CONSTRAINT group_id_pk PRIMARY KEY (group_id),
     CONSTRAINT group_service_id_fk FOREIGN KEY (group_service_id) REFERENCES storage.services (service_id)
 );
@@ -61,7 +61,8 @@ RETURNS TABLE (
     name TEXT,
     description TEXT,
     service_id UUID,
-    service_name TEXT
+    service_name TEXT,
+    active BOOLEAN
 )
 AS
 $BODY$
@@ -72,10 +73,11 @@ BEGIN
         g.group_name,
         g.group_description,
         s.service_id,
-        s.service_name
+        s.service_name,
+        g.state
     FROM storage.groups AS g
     INNER JOIN storage.services AS s ON g.group_service_id = s.service_id
-    WHERE group_id = _id;
+    WHERE g.group_id = _id;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Group not found';
     END IF;
@@ -93,7 +95,8 @@ RETURNS TABLE (
     name TEXT,
     description TEXT,
     service_id UUID,
-    service_name TEXT
+    service_name TEXT,
+    active BOOLEAN
 )
 AS
 $BODY$
@@ -104,13 +107,11 @@ BEGIN
         g.group_name,
         g.group_description,
         s.service_id,
-        s.service_name
+        s.service_name,
+        g.state
     FROM storage.groups AS g
     INNER JOIN storage.services AS s ON g.group_service_id = s.service_id
-    WHERE b.group_service_id = _service_id
-    AND g.state
-    AND b.state
-    GROUP BY g.group_id;
+    WHERE g.group_service_id = _service_id;
 END;
 $BODY$
 LANGUAGE plpgsql;

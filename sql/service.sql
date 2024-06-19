@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS storage.services (
 	state BOOLEAN NOT NULL DEFAULT TRUE,
 	CONSTRAINT service_id_pk PRIMARY KEY (service_id),
 	CONSTRAINT service_name_uk UNIQUE (service_name),
-	CONSTRAINT service_key_uk UNIQUE (service_key)
+	CONSTRAINT service_key_uk UNIQUE (service_key),
 	CONSTRAINT service_name_lowercase_ck CHECK (service_name = LOWER(service_name))
 );
 
@@ -25,8 +25,8 @@ service_description
 -- Functions for service management
 
 -- Create service
-CREATE OR REPLACE FUNCTION storage.create_service(
-	_id
+CREATE OR REPLACE FUNCTION storage.fn_create_service(
+	_id UUID,
 	_name TEXT,
 	_key TEXT,
 	_description TEXT
@@ -51,14 +51,14 @@ $BODY$
 LANGUAGE plpgsql;
 
 -- Read service
-CREATE OR REPLACE FUNCTION storage.read_service(
+CREATE OR REPLACE FUNCTION storage.fn_read_service(
 	_id UUID
 )
 RETURNS TABLE (
-	service_id UUID,
-	service_name TEXT,
-	service_key TEXT,
-	service_description TEXT
+	id UUID,
+	name TEXT,
+	key TEXT,
+	description TEXT,
 	state BOOLEAN
 )
 AS
@@ -66,12 +66,12 @@ $BODY$
 BEGIN
 	RETURN QUERY
 	SELECT
-		service_id,
-		service_name,
-		service_key,
-		service_description,
-		state
-	FROM storage.services
+		s.service_id,
+		s.service_name,
+		s.service_key,
+		s.service_description,
+		s.state
+	FROM storage.services AS s
 	WHERE service_id = _id;
 	IF NOT FOUND THEN
 		RAISE EXCEPTION 'Service not found';
@@ -81,14 +81,14 @@ $BODY$
 LANGUAGE plpgsql;
 
 -- Read service by key
-CREATE OR REPLACE FUNCTION storage.read_service_by_key(
+CREATE OR REPLACE FUNCTION storage.fn_read_service_by_key(
 	_key TEXT
 )
 RETURNS TABLE (
-	service_id UUID,
-	service_name TEXT,
-	service_key TEXT,
-	service_description TEXT
+	id UUID,
+	name TEXT,
+	key TEXT,
+	description TEXT,
 	state BOOLEAN
 )
 AS
@@ -96,22 +96,23 @@ $BODY$
 BEGIN
 	RETURN QUERY
 	SELECT
-		service_id,
-		service_name,
-		service_key,
-		service_description,
-		state
-	FROM storage.services
-	WHERE service_key = _key;
+		s.service_id,
+		s.service_name,
+		s.service_key,
+		s.service_description,
+		s.state
+	FROM storage.services AS s
+	WHERE s.service_key = _key;
 	IF NOT FOUND THEN
 		RAISE EXCEPTION 'Service not found';
 	END IF;
 END;
 $BODY$
 LANGUAGE plpgsql;
+-- SELECT * FROM storage.fn_read_service_by_key('$2a$04$d9VJdySAxrv6O6j.P74Gju.OEYRHK0yCeO5JD/rifAIp84JG7dABq');
 
 -- Update service
-CREATE OR REPLACE FUNCTION storage.update_service(
+CREATE OR REPLACE FUNCTION storage.fn_update_service(
 	_id UUID,
 	_name TEXT,
 	_key TEXT,
@@ -121,13 +122,13 @@ RETURNS VOID
 AS
 $BODY$
 BEGIN
-	UPDATE storage.services
+	UPDATE storage.services AS s
 	SET
 		service_name = _name,
 		service_key = _key,
 		service_description = _description,
 		updated_at = NOW()
-	WHERE service_id = _id;
+	WHERE s.service_id = _id;
 	IF NOT FOUND THEN
 		RAISE EXCEPTION 'Service not found';
 	END IF;
@@ -136,18 +137,18 @@ $BODY$
 LANGUAGE plpgsql;
 
 -- Disable service
-CREATE OR REPLACE FUNCTION storage.disable_service(
+CREATE OR REPLACE FUNCTION storage.fn_disable_service(
 	_id UUID
 )
 RETURNS VOID
 AS
 $BODY$
 BEGIN
-	UPDATE storage.services
+	UPDATE storage.services AS s
 	SET
 		state = FALSE,
 		updated_at = NOW()
-	WHERE service_id = _id;
+	WHERE s.service_id = _id;
 	IF NOT FOUND THEN
 		RAISE EXCEPTION 'Service not found';
 	END IF;
