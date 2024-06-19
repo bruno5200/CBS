@@ -10,19 +10,16 @@ import (
 	"github.com/google/uuid"
 )
 
-const (
-	API_KEY = "X-API-KEY"
-)
+const HeaderServiceId string = "X-SVC-ID"
 
 var (
-	ErrInvalidGroupId         = errors.New("invalid group id")          // invalid group id
-	ErrInvalidGroupServiceId  = errors.New("invalid group service id")  // invalid group service id
-	ErrInvalidGroupServiceKey = errors.New("invalid group service Key") // invalid group service key
-	ErrGroupNotFound          = errors.New("group not found")           // group not found
-	ErrNotGroups              = errors.New("no groups found")           // no groups found
-	ErrCreatingGroup          = errors.New("error creating group")      // error creating group
-	ErrUpdatingGroup          = errors.New("error updating group")      // error updating group
-	ErrGettingGroup           = errors.New("error getting group")       // error getting group
+	ErrInvalidGroupId        = errors.New("invalid group id")         // invalid group id
+	ErrInvalidGroupServiceId = errors.New("invalid group service id") // invalid group service id
+	ErrGroupNotFound         = errors.New("group not found")          // group not found
+	ErrNotGroups             = errors.New("no groups found")          // no groups found
+	ErrCreatingGroup         = errors.New("error creating group")     // error creating group
+	ErrUpdatingGroup         = errors.New("error updating group")     // error updating group
+	ErrGettingGroup          = errors.New("error getting group")      // error getting group
 )
 
 func UnmarshalGroup(data []byte) (*Group, error) {

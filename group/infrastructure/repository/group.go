@@ -6,8 +6,6 @@ import (
 
 	rb "github.com/bruno5200/CSM/block/infrastructure/repository"
 	d "github.com/bruno5200/CSM/group/domain"
-	ds "github.com/bruno5200/CSM/service/domain"
-	"github.com/bruno5200/CSM/service/infrastructure/repository"
 	u "github.com/bruno5200/CSM/util"
 	"github.com/google/uuid"
 )
@@ -71,7 +69,7 @@ func (r *groupRepository) ReadGroupsByService(id uuid.UUID) (*[]d.Group, error) 
 	if err != nil {
 		return nil, err
 	}
-	
+
 	defer rows.Close()
 
 	for rows.Next() {
@@ -83,10 +81,6 @@ func (r *groupRepository) ReadGroupsByService(id uuid.UUID) (*[]d.Group, error) 
 	}
 
 	return &groups, nil
-}
-
-func (r *groupRepository) ReadServiceByKey(key string) (*ds.Service, error) {
-	return repository.NewServiceRepository(r.db).ReadServiceByKey(key)
 }
 
 func (r *groupRepository) UpdateGroup(g *d.Group) error {

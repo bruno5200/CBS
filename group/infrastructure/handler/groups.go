@@ -1,31 +1,25 @@
 package handler
 
 import (
-	"encoding/base64"
 	"log"
 
 	d "github.com/bruno5200/CSM/group/domain"
 	p "github.com/bruno5200/CSM/group/infrastructure/presenter"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/utils/v2"
+	"github.com/google/uuid"
 )
 
 func (h *groupHandler) GetByService(c *fiber.Ctx) error {
 
-	key, err := base64.StdEncoding.DecodeString(utils.CopyString(c.Get(d.API_KEY)))
+	serviceId, err := uuid.Parse(utils.CopyString(c.Get(d.HeaderServiceId)))
 
 	if err != nil {
-		log.Printf("Error parsing key: %s", err)
-		return c.Status(fiber.StatusBadRequest).JSON(p.GroupErrorResponse(d.ErrInvalidGroupServiceKey))
+		log.Printf("Error parsing serviceId: %s", err)
+		return c.Status(fiber.StatusBadRequest).JSON(p.GroupErrorResponse(d.ErrInvalidGroupServiceId))
 	}
 
-	service, err := h.GroupService.GetServiceByKey(string(key))
-
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(p.GroupErrorResponse(err))
-	}
-
-	groups, err := h.GroupService.GetGroupsByService(service.Id)
+	groups, err := h.GroupService.GetGroupsByService(serviceId)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(p.GroupErrorResponse(err))

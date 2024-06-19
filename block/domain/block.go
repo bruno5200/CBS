@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	FilesDir        = "./files"
-	HeaderServiceId = "X-SVC-ID"
+	FilesDir        string = "./files"
+	HeaderServiceId string = "X-SVC-ID"
 )
 
 var (
