@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	psqlCreateGroup            = `SELECT storage.fn_create_group($1, $2, $3, $4);`
-	psqlReadGroup              = `SELECT id, name, service_id, service_name, active FROM storage.fn_read_group($1);`
-	psqlReadGroupsByServiceKey = `SELECT id, name, service_id, service_name, active FROM storage.fn_read_groups_by_service_key($1);`
-	psqlUpdateGroup            = `SELECT storage.fn_update_group($1, $2, $3, $4);`
-	psqlDeleteGroup            = `SELECT storage.fn_delete_group($1);`
+	psqlCreateGroup         = `SELECT storage.fn_create_group($1, $2, $3, $4);`
+	psqlReadGroup           = `SELECT id, name, service_id, service_name, active FROM storage.fn_read_group($1);`
+	psqlReadGroupsByService = `SELECT id, name, service_id, service_name, active FROM storage.fn_read_groups_by_service($1);`
+	psqlUpdateGroup         = `SELECT storage.fn_update_group($1, $2, $3, $4);`
+	psqlDeleteGroup         = `SELECT storage.fn_delete_group($1);`
 )
 
 type groupDB struct {
@@ -64,7 +64,7 @@ func (r *groupRepository) ReadGroupsByService(id uuid.UUID) (*[]d.Group, error) 
 	var groups []d.Group
 
 	log.Printf("DB: PSQL, F: storage.fn_read_groups_by_service('%s'), O:SELECT, T: storage.group", id)
-	rows, err := r.db.Query(psqlReadGroupsByServiceKey, id)
+	rows, err := r.db.Query(psqlReadGroupsByService, id)
 
 	if err != nil {
 		return nil, err
