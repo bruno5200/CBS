@@ -16,7 +16,7 @@ const (
 	psqlReadBlocksByGroup   = `SELECT id, name, checksum, extension, url, at, group_id, group_name, service_id, service_name, active FROM storage.fn_read_blocks_by_group($1);`
 	psqlReadBlocksByService = `SELECT id, name, checksum, extension, url, at, group_id, group_name, service_id, service_name, active FROM storage.fn_read_blocks_by_service($1);`
 	psqlUpdateBlock         = `SELECT storage.fn_update_block($1, $2, $3, $4, $5, $6, $7);`
-	psqlDeleteBlock         = `SELECT storage.fn_delete_block($1);`
+	psqlDeleteBlock         = `SELECT storage.fn_disable_block($1);`
 )
 
 type blockDB struct {
