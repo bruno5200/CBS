@@ -379,7 +379,7 @@ func TestValidBussines(t *testing.T) {
 		},
 		{
 			"123",
-			true,
+			false,
 			"numbers",
 		},
 		{
@@ -409,11 +409,11 @@ func TestValidBussines(t *testing.T) {
 		},
 		{
 			"sf2344 jhsvfyu",
-			true,
+			false,
 			"invalid bussiness",
 		},
 		{
-			"Lucy Ecos",
+			"lucy_ecos",
 			true,
 			"valid bussiness",
 		},

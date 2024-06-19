@@ -2,42 +2,53 @@ package middleware
 
 import (
 	"encoding/base64"
+	"errors"
+	"log"
+	"strings"
 
+	db "github.com/bruno5200/CSM/database"
+	r "github.com/bruno5200/CSM/service/infrastructure/repository"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/utils/v2"
 )
 
 const (
 	headerKey = "X-API-KEY"
-	pagosKey  = "JDJhJDA0JGQ5VkpkeVNBeHJ2Nk82ai5QNzRHanUuT0VZUkhLMHlDZU81SkQvcmlmQUlwODRKRzdkQUJx"
-	pagosHash = "$2a$04$d9VJdySAxrv6O6j.P74Gju.OEYRHK0yCeO5JD/rifAIp84JG7dABq"
+	preFix    = "Key "
 )
+
+var ErrInvalidApiKey = errors.New("invalid Key")
 
 func ApiKey() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
 		// decode base64 string
-		key, err := apiKey(utils.CopyString(c.Get(headerKey)))
-
-		if err != nil {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Unauthorized"})
+		if err := apiKey(utils.CopyString(c.Get(headerKey))); err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error(), "success": false})
 		}
 
-		if key != pagosHash {
-			return c.Status(fiber.StatusNotFound).SendFile("./www/unauthorized.html")
-		}
 		return c.Next()
 	}
 }
 
-func apiKey(auth string) (hash string, err error) {
-	key := auth[len("Key "):]
-	// Split the base64 encoded string
-	decoded, err := base64.StdEncoding.DecodeString(key)
+func apiKey(auth string) error {
 
-	if err != nil {
-		return "", err
+	if !strings.Contains(auth, preFix) {
+		return ErrInvalidApiKey
 	}
 
-	return string(decoded), nil
+	// Split the base64 encoded string
+	decoded, err := base64.StdEncoding.DecodeString(auth[len(preFix):])
+
+	if err != nil {
+		log.Printf("Error decoding key: %s", err)
+		return ErrInvalidApiKey
+	}
+
+	if _, err = r.NewServiceRepository(db.PostgresDB()).ReadServiceByKey(string(decoded)); err != nil {
+		log.Printf("Error reading service with Header Key: %s", err)
+		return ErrInvalidApiKey
+	}
+
+	return nil
 }
