@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS storage.blocks (
 	block_group_id UUID NOT NULL,
 	state BOOLEAN NOT NULL DEFAULT TRUE,
 	CONSTRAINT block_id_pk PRIMARY KEY (block_id),
-	CONSTRAINT block_group_id_fk FOREIGN KEY (block_group_id) REFERENCES storage.groups (group_id)
+	CONSTRAINT block_group_id_fk FOREIGN KEY (block_group_id) REFERENCES storage.groups (group_id),
+	CONSTRAINT block_group_id_block_checksum_uk UNIQUE (block_checksum, block_group_id)
 );
 
 INSERT INTO storage.blocks (
@@ -37,6 +38,19 @@ CREATE OR REPLACE FUNCTION storage.fn_create_block(
 AS
 $BODY$
 BEGIN
+	IF EXISTS (SELECT 1 FROM storage.blocks AS b WHERE b.checksum = _checksum AND NOT b.state) THEN
+		UPDATE storage.blocks AS b SET
+		block_name = _name,
+		block_url = _url,
+		block_group_id = _group_id,
+		state = TRUE
+		WHERE b.block_checksum = _checksum
+		AND NOT b.state;
+		IF NOT FOUND THEN
+			RAISE EXCEPTION 'Block not updated';
+		END IF;
+		RETURN;
+	END IF;
 	INSERT INTO storage.blocks(
 		block_id,
 		block_name,
@@ -141,6 +155,7 @@ BEGIN
 	INNER JOIN storage.groups g ON b.block_group_id = g.group_id
 	INNER JOIN storage.services s ON g.group_service_id = s.service_id
 	WHERE b.block_checksum = _checksum
+	AND b.state
 	AND g.state;
 	IF NOT FOUND THEN
 		RAISE EXCEPTION 'Block not found';

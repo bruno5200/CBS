@@ -38,7 +38,7 @@ func (g *Group) Item() *memcache.Item {
 	return &memcache.Item{
 		Key:        g.Id.String(),
 		Value:      data,
-		Expiration: int32(time.Now().AddDate(0, 1, 0).Unix() - time.Now().Unix()/1000),
+		Expiration: int32(time.Now().AddDate(0, 1, 0).Unix() - time.Now().Unix()),
 	}
 }
 

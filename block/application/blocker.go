@@ -91,6 +91,8 @@ func (s *blockService) GetBlockByCheksum(checksum string) (*d.Block, error) {
 
 			return block, nil
 
+		} else if !block.Active {
+			return nil, d.ErrBlockNotFound
 		} else {
 			log.Printf("BLOCK: %s", err)
 		}
@@ -99,9 +101,13 @@ func (s *blockService) GetBlockByCheksum(checksum string) (*d.Block, error) {
 		log.Printf("MEM: %s", err)
 	}
 
-	if block, err := s.BlockRepo.ReadBlockByCheksum(checksum); err == nil {
+	if block, err := s.BlockRepo.ReadBlockByCheksum(checksum); err == nil && !block.Active {
 
-		return block, s.Cache.Set(block.Item())
+		if err := s.Cache.Set(block.Item()); err != nil {
+			log.Printf("MEM: %s", err)
+		}
+
+		return block, nil
 
 	} else {
 		log.Printf("DB: %s", err)

@@ -15,7 +15,7 @@ const (
 	psqlReadGroup           = `SELECT id, name, service_id, service_name, active FROM storage.fn_read_group($1);`
 	psqlReadGroupsByService = `SELECT id, name, service_id, service_name, active FROM storage.fn_read_groups_by_service($1);`
 	psqlUpdateGroup         = `SELECT storage.fn_update_group($1, $2, $3, $4);`
-	psqlDeleteGroup         = `SELECT storage.fn_delete_group($1);`
+	psqlDeleteGroup         = `SELECT storage.fn_disable_group($1);`
 )
 
 type groupDB struct {

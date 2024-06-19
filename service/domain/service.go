@@ -46,7 +46,7 @@ func (s *Service) Item() *memcache.Item {
 	return &memcache.Item{
 		Key:        s.Id.String(),
 		Value:      data,
-		Expiration: int32(time.Now().AddDate(0, 1, 0).Unix() - time.Now().Unix()/1000),
+		Expiration: int32(time.Now().AddDate(0, 1, 0).Unix() - time.Now().Unix()),
 	}
 }
 
@@ -56,7 +56,7 @@ func (s *Service) ItemName() *memcache.Item {
 	return &memcache.Item{
 		Key:        s.Name,
 		Value:      data,
-		Expiration: int32(time.Now().AddDate(0, 1, 0).Unix() - time.Now().Unix()/1000),
+		Expiration: int32(time.Now().AddDate(0, 1, 0).Unix() - time.Now().Unix()),
 	}
 }
 
@@ -66,7 +66,7 @@ func (s *Service) ItemKey() *memcache.Item {
 	return &memcache.Item{
 		Key:        s.Key,
 		Value:      data,
-		Expiration: int32(time.Now().AddDate(0, 1, 0).Unix() - time.Now().Unix()/1000),
+		Expiration: int32(time.Now().AddDate(0, 1, 0).Unix() - time.Now().Unix()),
 	}
 }
 
