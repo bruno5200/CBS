@@ -6,11 +6,11 @@ import (
 )
 
 type BlockRepository interface {
+	CreateBlock(b *d.Block) error
 	ReadBlock(id uuid.UUID) (*d.Block, error)
 	ReadBlockByCheksum(checksum string) (*d.Block, error)
 	ReadBlocksByGroup(groupId uuid.UUID) (*[]d.Block, error)
 	ReadBlocksByService(serviceId uuid.UUID) (*[]d.Block, error)
-	CreateBlock(b *d.Block) error
 	UpdateBlock(b *d.Block) error
 	DisableBlock(id uuid.UUID) error
 }

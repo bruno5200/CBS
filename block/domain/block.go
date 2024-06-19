@@ -20,10 +20,11 @@ var (
 	ErrInvalidBlockServiceId = errors.New("invalid block service id") // invalid block service id
 	ErrInvalidBlockGroupId   = errors.New("invalid block group id")   // invalid block group id
 	ErrMalformedFormKey      = errors.New("form key must be 'file'")  // form key must be 'file'
-	ErrGettingBlock          = errors.New("error getting block")      // error getting block
 	ErrBlockNotFound         = errors.New("Block not found")          // Block not found
 	ErrNotBlocks             = errors.New("no blocks found")          // no blocks found
 	ErrCreatingBlock         = errors.New("error creating block")     // error creating block
+	ErrUpdatingBlock         = errors.New("error updating block")     // error updating block
+	ErrGettingBlock          = errors.New("error getting block")      // error getting block
 )
 
 func UnmarshalBlock(data []byte) (*Block, error) {
@@ -42,7 +43,7 @@ func (b *Block) Item() *memcache.Item {
 	return &memcache.Item{
 		Key:        b.Id.String(),
 		Value:      data,
-		Expiration: int32(time.Now().AddDate(0, 1, 0).Unix() - time.Now().Unix()),
+		Expiration: int32(time.Now().AddDate(0, 1, 0).Unix() - time.Now().Unix()/1000),
 	}
 }
 
@@ -52,7 +53,7 @@ func (b *Block) ItemCheksum() *memcache.Item {
 	return &memcache.Item{
 		Key:        b.Checksum,
 		Value:      data,
-		Expiration: int32(time.Now().AddDate(0, 1, 0).Unix() - time.Now().Unix()),
+		Expiration: int32(time.Now().AddDate(0, 1, 0).Unix() - time.Now().Unix()/1000),
 	}
 }
 

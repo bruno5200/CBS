@@ -8,9 +8,9 @@ import (
 
 func BlockRouter(app fiber.Router, h a.BlockHandler) {
 	b := app.Group("api/v1/")
-	b.Get("block/:id.:format", h.GetParam)
+	b.Get("block/:id.:format", m.ApiKey(), h.GetParam)
 	b.Get("block/:id", h.Get)
-	b.Get("blocks/:groupId", h.GetByGroup)
+	b.Get("blocks/:groupId", m.ApiKey(), h.GetByGroup)
 	b.Get("blocks", m.ApiKey(), h.GetByService)
 	b.Post("block/:groupId.:format", m.ApiKey(), h.PostParam)
 	b.Post("block/:groupId", m.ApiKey(), h.Post)

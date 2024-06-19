@@ -75,7 +75,7 @@ func (h *blockHandler) Post(c *fiber.Ctx) error {
 	log.Printf("Checksum: %s", checksum)
 
 	if block, err := h.BlockService.GetBlockByCheksum(checksum); err == nil {
-		return c.Status(fiber.StatusAccepted).JSON(p.BlockCreateResponse(fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), block.Id)))
+		return c.Status(fiber.StatusAccepted).JSON(p.BlockCreateResponse(block.Id, fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), block.Id)))
 	}
 
 	var url, key string
@@ -111,7 +111,7 @@ func (h *blockHandler) Post(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(p.BlockErrorResponse(err))
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(p.BlockCreateResponse(fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), block.Id)))
+	return c.Status(fiber.StatusCreated).JSON(p.BlockCreateResponse(block.Id, fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), block.Id)))
 }
 
 func (h *blockHandler) PostParam(c *fiber.Ctx) error {
@@ -158,7 +158,7 @@ func (h *blockHandler) PostParam(c *fiber.Ctx) error {
 
 	if block, err := h.BlockService.GetBlockByCheksum(checksum); err == nil {
 		log.Printf("File already exists: %s", block.Id)
-		return c.Status(fiber.StatusAccepted).JSON(p.BlockCreateResponse(fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), block.Id)))
+		return c.Status(fiber.StatusAccepted).JSON(p.BlockCreateResponse(block.Id, fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), block.Id)))
 	}
 
 	ext := strings.ToLower(blockRequest.Extension)
@@ -190,5 +190,5 @@ func (h *blockHandler) PostParam(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(p.BlockErrorResponse(err))
 	}
 
-	return c.Status(fiber.StatusCreated).JSON(p.BlockCreateResponse(fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), block.Id)))
+	return c.Status(fiber.StatusCreated).JSON(p.BlockCreateResponse(block.Id, fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), block.Id)))
 }

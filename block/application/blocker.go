@@ -51,6 +51,8 @@ func (s *blockService) GetBlock(id uuid.UUID) (*d.Block, error) {
 				log.Printf("MEM: %s", err)
 			}
 
+			return block, nil
+
 		} else {
 			log.Printf("BLOCK: %s", err)
 		}
@@ -83,6 +85,12 @@ func (s *blockService) GetBlockByCheksum(checksum string) (*d.Block, error) {
 				log.Printf("MEM: %s", err)
 			}
 
+			if err := s.Cache.Set(block.ItemCheksum()); err != nil {
+				log.Printf("MEM: %s", err)
+			}
+
+			return block, nil
+
 		} else {
 			log.Printf("BLOCK: %s", err)
 		}
@@ -102,11 +110,21 @@ func (s *blockService) GetBlockByCheksum(checksum string) (*d.Block, error) {
 }
 
 func (s *blockService) GetBlocksByGroup(groupId uuid.UUID) (*[]d.Block, error) {
-	return s.BlockRepo.ReadBlocksByGroup(groupId)
+	if blocks, err := s.BlockRepo.ReadBlocksByGroup(groupId); err == nil {
+		return blocks, nil
+	} else {
+		log.Printf("DB: %s", err)
+		return nil, d.ErrGettingBlock
+	}
 }
 
 func (s *blockService) GetBlocksByService(serviceId uuid.UUID) (*[]d.Block, error) {
-	return s.BlockRepo.ReadBlocksByService(serviceId)
+	if blocks, err := s.BlockRepo.ReadBlocksByService(serviceId); err == nil {
+		return blocks, nil
+	} else {
+		log.Printf("DB: %s", err)
+		return nil, d.ErrGettingBlock
+	}
 }
 
 func (s *blockService) UpdateBlock(block *d.Block) error {
