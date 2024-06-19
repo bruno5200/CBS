@@ -79,14 +79,6 @@ func (b *Block) Update(block *Block) {
 	if block.GroupId != uuid.Nil {
 		b.GroupId = block.GroupId
 	}
-
-	if block.ServiceId != uuid.Nil {
-		b.ServiceId = block.ServiceId
-	}
-
-	if block.Active {
-		b.Active = block.Active
-	}
 }
 
 func NewBlock(name, checksum, url, extension string, id, groupId, serviceId uuid.UUID) *Block {
