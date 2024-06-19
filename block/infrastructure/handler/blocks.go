@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"log"
 
 	d "github.com/bruno5200/CSM/block/domain"
@@ -42,10 +41,6 @@ func (h *blockHandler) GetByService(c *fiber.Ctx) error {
 
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(p.BlockErrorResponse(err))
-	}
-
-	for _, block := range *blocks {
-		block.Url = fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), block.Id)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(p.BlocksSuccessResponse(blocks))

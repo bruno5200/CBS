@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	d "github.com/bruno5200/CSM/block/domain"
 	"github.com/bruno5200/CSM/block/infrastructure/client"
@@ -32,7 +33,7 @@ func (h *blockHandler) Get(c *fiber.Ctx) error {
 
 	filePath := d.FilesDir + block.Name
 
-	if err := client.NewClient().DownloadFromBlobStorage(block.Url, filePath); err != nil {
+	if err := client.NewClient().DownloadFromBlobStorage(fmt.Sprintf("%s/%s.%s", blobPath(block.Extension), block.Id, block.Extension), filePath); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(p.BlockErrorResponse(err))
 	}
 
@@ -53,7 +54,17 @@ func (h *blockHandler) GetParam(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(p.BlockErrorResponse(err))
 	}
 
-	block.Url = fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), block.Id)
-
 	return c.Status(fiber.StatusOK).JSON(p.BlockSuccessResponse(block))
+}
+
+func blobPath(extension string) string {
+
+	switch strings.ToLower(strings.ReplaceAll(extension, ".", "")) {
+	case "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "md", "html", "csv", "xml", "json", "yaml", "yml", "toml", "txt":
+		return e.GetBlobUrl("documents")
+	case "jpg", "jpeg", "png", "gif", "svg", "webp", "bmp", "ico", "tiff", "tif":
+		return e.GetBlobUrl("images")
+	default:
+		return e.GetBlobUrl("")
+	}
 }

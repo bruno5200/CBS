@@ -2,12 +2,16 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	d "github.com/bruno5200/CSM/block/domain"
-	"github.com/bruno5200/CSM/util"
+	"github.com/bruno5200/CSM/env"
+	u "github.com/bruno5200/CSM/util"
 	"github.com/google/uuid"
 )
+
+var e = env.Env()
 
 const (
 	psqlCreateBlock         = `SELECT storage.fn_create_block($1, $2, $3, $4, $5, $6);`
@@ -133,16 +137,16 @@ func (r *blockRepository) DisableBlock(id uuid.UUID) error {
 func block(b blockDB) d.Block {
 	return d.Block{
 		Id:          b.Id,
-		Name:        util.NullToString(b.Name),
-		Checksum:    util.NullToString(b.Checksum),
-		Extension:   util.NullToString(b.Extension),
-		Url:         util.NullToString(b.Url),
-		UploadedAt:  util.NullToTime(b.UploadedAt),
+		Name:        u.NullToString(b.Name),
+		Checksum:    u.NullToString(b.Checksum),
+		Extension:   u.NullToString(b.Extension),
+		Url:         fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), b.Id),
+		UploadedAt:  u.NullToTime(b.UploadedAt),
 		GroupId:     b.GroupId,
-		GroupName:   util.NullToString(b.GroupName),
+		GroupName:   u.NullToString(b.GroupName),
 		ServiceId:   b.ServiceId,
-		ServiceName: util.NullToString(b.ServiceName),
-		Active:      util.NullToBool(b.Active),
+		ServiceName: u.NullToString(b.ServiceName),
+		Active:      u.NullToBool(b.Active),
 	}
 }
 

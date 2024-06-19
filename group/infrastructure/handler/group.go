@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"log"
 
 	d "github.com/bruno5200/CSM/group/domain"
@@ -23,10 +22,6 @@ func (h *groupHandler) Get(c *fiber.Ctx) error {
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(p.GroupErrorResponse(err))
-	}
-
-	for _, block := range *groups.Blocks {
-		block.Url = fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), block.Id)
 	}
 
 	return c.Status(fiber.StatusOK).JSON(p.GroupSuccessResponse(groups))
