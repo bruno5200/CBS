@@ -8,9 +8,9 @@ import (
 
 func GroupRouter(app fiber.Router, h a.GroupHandler) {
 	g := app.Group("api/v1/")
-	g.Get("groups/:groupId", m.ApiKey(), h.Get)
+	g.Get("group/:groupId", m.ApiKey(), h.Get)
 	g.Get("groups", m.ApiKey(), h.GetByService)
-	g.Post("group/:groupId", m.ApiKey(), h.Post)
+	g.Post("group", m.ApiKey(), h.Post)
 	g.Put("group/:id", m.ApiKey(), h.Put)
 	g.Delete("group/:id", m.ApiKey(), h.Delete)
 }

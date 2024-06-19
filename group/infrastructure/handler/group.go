@@ -11,7 +11,7 @@ import (
 
 func (h *groupHandler) Get(c *fiber.Ctx) error {
 
-	id, err := uuid.Parse(c.Params("id"))
+	id, err := uuid.Parse(c.Params("groupId"))
 
 	if err != nil {
 		log.Printf("Error parsing id: %s", err)

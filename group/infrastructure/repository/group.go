@@ -4,17 +4,20 @@ import (
 	"database/sql"
 	"log"
 
+	rb "github.com/bruno5200/CSM/block/infrastructure/repository"
 	d "github.com/bruno5200/CSM/group/domain"
+	ds "github.com/bruno5200/CSM/service/domain"
+	"github.com/bruno5200/CSM/service/infrastructure/repository"
 	u "github.com/bruno5200/CSM/util"
 	"github.com/google/uuid"
 )
 
 const (
-	psqlCreateGroup         = `SELECT storage.fn_create_group($1, $2, $3, $4);`
-	psqlReadGroup           = `SELECT id, name, service_id, service_name, active FROM storage.fn_read_group($1);`
-	psqlReadGroupsByService = `SELECT id, name, service_id, service_name, active FROM storage.fn_read_groups_by_service($1);`
-	psqlUpdateGroup         = `SELECT storage.fn_update_group($1, $2, $3, $4);`
-	psqlDeleteGroup         = `SELECT storage.fn_delete_group($1);`
+	psqlCreateGroup            = `SELECT storage.fn_create_group($1, $2, $3, $4);`
+	psqlReadGroup              = `SELECT id, name, service_id, service_name, active FROM storage.fn_read_group($1);`
+	psqlReadGroupsByServiceKey = `SELECT id, name, service_id, service_name, active FROM storage.fn_read_groups_by_service_key($1);`
+	psqlUpdateGroup            = `SELECT storage.fn_update_group($1, $2, $3, $4);`
+	psqlDeleteGroup            = `SELECT storage.fn_delete_group($1);`
 )
 
 type groupDB struct {
@@ -40,7 +43,6 @@ func (r *groupRepository) CreateGroup(g *d.Group) error {
 	_, err := r.db.Exec(psqlCreateGroup, g.Id, g.Name, g.Description, g.ServiceId)
 
 	return err
-
 }
 
 func (r *groupRepository) ReadGroup(id uuid.UUID) (*d.Group, error) {
@@ -50,15 +52,19 @@ func (r *groupRepository) ReadGroup(id uuid.UUID) (*d.Group, error) {
 	log.Printf("DB: PSQL, F: storage.fn_read_group('%s'), O:SELECT, T: storage.group", id)
 	err := r.db.QueryRow(psqlReadGroup, id).Scan(&g.Id, &g.Name, &g.ServiceId, &g.ServiceName, &g.Active)
 
-	return pointerGroup(group(g)), err
+	group := pointerGroup(group(g))
 
+	group.Blocks, _ = rb.NewBlockRepository(r.db).ReadBlocksByGroup(id)
+
+	return group, err
 }
 
-func (r *groupRepository) ReadGroupsByService() (*[]d.Group, error) {
+func (r *groupRepository) ReadGroupsByService(id uuid.UUID) (*[]d.Group, error) {
 
 	var groups []d.Group
 
-	rows, err := r.db.Query(psqlReadGroupsByService, nil)
+	log.Printf("DB: PSQL, F: storage.fn_read_groups_by_service('%s'), O:SELECT, T: storage.group", id)
+	rows, err := r.db.Query(psqlReadGroupsByServiceKey, id)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +79,10 @@ func (r *groupRepository) ReadGroupsByService() (*[]d.Group, error) {
 	}
 
 	return &groups, nil
+}
 
+func (r *groupRepository) ReadServiceByKey(key string) (*ds.Service, error) {
+	return repository.NewServiceRepository(r.db).ReadServiceByKey(key)
 }
 
 func (r *groupRepository) UpdateGroup(g *d.Group) error {
@@ -82,7 +91,6 @@ func (r *groupRepository) UpdateGroup(g *d.Group) error {
 	_, err := r.db.Exec(psqlUpdateGroup, g.Id, g.Name, g.Description, g.ServiceId)
 
 	return err
-
 }
 
 func (r *groupRepository) DisableGroup(id uuid.UUID) error {
@@ -91,7 +99,6 @@ func (r *groupRepository) DisableGroup(id uuid.UUID) error {
 	_, err := r.db.Exec(psqlDeleteGroup, id)
 
 	return err
-
 }
 
 func group(g groupDB) d.Group {
