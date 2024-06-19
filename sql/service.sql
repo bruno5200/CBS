@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS storage.services (
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	updated_at TIMESTAMPTZ,
 	delete_at TIMESTAMPTZ,
-	state BOOLEAN NOT NULL DEFAULT TRUE,
+	active BOOLEAN NOT NULL DEFAULT TRUE,
 	CONSTRAINT service_id_pk PRIMARY KEY (service_id),
 	CONSTRAINT service_name_uk UNIQUE (service_name),
 	CONSTRAINT service_key_uk UNIQUE (service_key),
@@ -59,7 +59,7 @@ RETURNS TABLE (
 	name TEXT,
 	key TEXT,
 	description TEXT,
-	state BOOLEAN
+	active BOOLEAN
 )
 AS
 $BODY$
@@ -89,7 +89,7 @@ RETURNS TABLE (
 	name TEXT,
 	key TEXT,
 	description TEXT,
-	state BOOLEAN
+	active BOOLEAN
 )
 AS
 $BODY$
