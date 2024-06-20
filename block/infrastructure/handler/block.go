@@ -32,7 +32,7 @@ func (h *blockHandler) Get(c *fiber.Ctx) error {
 	}
 
 	filePath := d.FilesDir + block.Name
-	blobUrl := fmt.Sprintf("%s/%s.%s", blobPath(block.Extension), block.Id, block.Extension)
+	blobUrl := fmt.Sprintf("%s/%s.%s", blobPath(block.Extension), block.Id, strings.ToLower(block.Extension))
 
 	log.Printf("Blob Url: %s", blobUrl)
 
