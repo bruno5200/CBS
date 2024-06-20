@@ -1,3 +1,6 @@
+-- Create schema storage
+CREATE SCHEMA IF NOT EXISTS storage;
+
 -- Create table storage.services
 CREATE TABLE IF NOT EXISTS storage.services (
 	service_id UUID NOT NULL,
@@ -7,7 +10,7 @@ CREATE TABLE IF NOT EXISTS storage.services (
 	created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 	updated_at TIMESTAMPTZ,
 	delete_at TIMESTAMPTZ,
-	active BOOLEAN NOT NULL DEFAULT TRUE,
+	state BOOLEAN NOT NULL DEFAULT TRUE,
 	CONSTRAINT service_id_pk PRIMARY KEY (service_id),
 	CONSTRAINT service_name_uk UNIQUE (service_name),
 	CONSTRAINT service_key_uk UNIQUE (service_key),

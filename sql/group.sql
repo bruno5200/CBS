@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS storage.groups (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ,
     delete_at TIMESTAMPTZ,
-    active BOOLEAN NOT NULL DEFAULT TRUE,
+    state BOOLEAN NOT NULL DEFAULT TRUE,
     CONSTRAINT group_id_pk PRIMARY KEY (group_id),
     CONSTRAINT group_service_id_fk FOREIGN KEY (group_service_id) REFERENCES storage.services (service_id)
 );

@@ -32,8 +32,11 @@ func (h *blockHandler) Get(c *fiber.Ctx) error {
 	}
 
 	filePath := d.FilesDir + block.Name
+	blobUrl := fmt.Sprintf("%s/%s.%s", blobPath(block.Extension), block.Id, block.Extension)
 
-	if err := client.NewClient().DownloadFromBlobStorage(fmt.Sprintf("%s/%s.%s", blobPath(block.Extension), block.Id, block.Extension), filePath); err != nil {
+	log.Printf("Blob Url: %s", blobUrl)
+
+	if err := client.NewClient().DownloadFromBlobStorage(blobUrl, filePath); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(p.BlockErrorResponse(err))
 	}
 
