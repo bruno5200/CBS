@@ -74,7 +74,7 @@ func (h *blockHandler) Post(c *fiber.Ctx) error {
 
 	log.Printf("Checksum: %s", checksum)
 
-	if block, err := h.BlockService.GetBlockByCheksum(checksum); err == nil {
+	if block, err := h.BlockService.GetBlockByCheksum(checksum); err == nil && block.Active {
 		return c.Status(fiber.StatusAccepted).JSON(p.BlockCreateResponse(block.Id, fmt.Sprintf("%s/api/v1/block/%s", e.GetUrl(), block.Id)))
 	}
 

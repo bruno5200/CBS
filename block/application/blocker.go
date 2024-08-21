@@ -101,7 +101,7 @@ func (s *blockService) GetBlockByCheksum(checksum string) (*d.Block, error) {
 		log.Printf("MEM: %s", err)
 	}
 
-	if block, err := s.BlockRepo.ReadBlockByCheksum(checksum); err == nil && !block.Active {
+	if block, err := s.BlockRepo.ReadBlockByCheksum(checksum); err == nil {
 
 		if err := s.Cache.Set(block.Item()); err != nil {
 			log.Printf("MEM: %s", err)
