@@ -38,7 +38,7 @@ CREATE OR REPLACE FUNCTION storage.fn_create_block(
 AS
 $BODY$
 BEGIN
-	IF EXISTS (SELECT 1 FROM storage.blocks AS b WHERE b.checksum = _checksum AND NOT b.state) THEN
+	IF EXISTS (SELECT 1 FROM storage.blocks AS b WHERE b.block_checksum = _checksum AND NOT b.state) THEN
 		UPDATE storage.blocks AS b SET
 		block_name = _name,
 		block_url = _url,
