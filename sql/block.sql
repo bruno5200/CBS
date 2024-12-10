@@ -38,13 +38,15 @@ CREATE OR REPLACE FUNCTION storage.fn_create_block(
 AS
 $BODY$
 BEGIN
-	IF EXISTS (SELECT 1 FROM storage.blocks AS b WHERE b.block_checksum = _checksum AND NOT b.state) THEN
+	IF EXISTS (SELECT 1 FROM storage.blocks AS b WHERE b.block_checksum = _checksum AND block_group_id = _group_id AND NOT b.state) THEN
 		UPDATE storage.blocks AS b SET
+		block_id = _id,
 		block_name = _name,
 		block_url = _url,
 		block_group_id = _group_id,
 		state = TRUE
 		WHERE b.block_checksum = _checksum
+		AND block_group_id = _group_id
 		AND NOT b.state;
 		IF NOT FOUND THEN
 			RAISE EXCEPTION 'Block not updated';
